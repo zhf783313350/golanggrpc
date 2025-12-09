@@ -16,7 +16,7 @@ type Server struct {
 
 func (s *Server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloResponse, error) {
 	// 故意写错字段名,引入编译错误
-	return &pb.HelloResponse{Message: "Hello " + in.WrongField}, nil
+	return &pb.HelloResponse{Message: "Hello " + in.DFGSFD}, nil
 }
 func main() {
 
