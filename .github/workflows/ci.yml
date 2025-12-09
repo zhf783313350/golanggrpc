@@ -52,3 +52,7 @@ jobs:
     
     - name: 构建客户端
       run: go build -v ./main
+
+          # 8. 构建 Docker 镜像
+    - name: 构建 Docker 镜像
+      run: docker build -t golanggrpc-server -f server/Dockerfile .
