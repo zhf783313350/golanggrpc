@@ -1,0 +1,54 @@
+name: Go CI
+
+# 触发条件:当推送代码或创建 PR 时运行
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+# 定义任务
+jobs:
+  build:
+    # 运行环境
+    runs-on: ubuntu-latest
+    
+    steps:
+    # 1. 检出代码
+    - name: 检出代码
+      uses: actions/checkout@v4
+    
+    # 2. 设置 Go 环境
+    - name: 设置 Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.21'
+    
+    # 3. 安装 protoc
+    - name: 安装 protoc
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y protobuf-compiler
+        go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+        go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+    
+    # 4. 生成 proto 代码
+    - name: 生成 proto 代码
+      run: |
+        export PATH="$PATH:$(go env GOPATH)/bin"
+        protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/hello.proto
+    
+    # 5. 下载依赖
+    - name: 下载依赖
+      run: go mod download
+    
+    # 6. 运行测试
+    - name: 运行测试
+      run: go test -v ./...
+    
+    # 7. 构建项目
+    - name: 构建服务端
+      run: go build -v ./server
+    
+    - name: 构建客户端
+      run: go build -v ./main
